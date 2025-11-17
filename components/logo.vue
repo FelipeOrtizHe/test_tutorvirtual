@@ -30,16 +30,5 @@ const logoPath = computed(() => {
 </template>
 
 <style scoped>
-/* Estilos para el logo */
-.logo {
-  width: 150px; /* Ajusta el tamaño según tus necesidades */
-  height: auto; /* Mantiene la proporción de la imagen */
-}
-
-/* Estilos para el placeholder (mientras el logo se carga) */
-.logo-placeholder {
-  width: 150px; /* Mismo ancho que el logo */
-  height: 70px; /* Ajusta la altura según el tamaño del logo */
-  background-color: transparent; /* Fondo transparente */
-}
+@import '@/assets/components/logo.css';
 </style>

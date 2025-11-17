@@ -1,39 +1,65 @@
 <template>
-  <UCard>
-    <div class="flex justify-end">
-      <UButton @click="openCreateModal" color="primary" class="mb-4" icon="i-heroicons-plus-circle-20-solid" />
+  <UCard class="table-teacher-container">
+
+    <!-- Crear docente -->
+    <div class="create-btn-wrapper">
+      <UButton
+        @click="openCreateModal"
+        color="primary"
+        icon="i-heroicons-plus-circle-20-solid"
+      />
     </div>
 
-    <UInput v-model="search" placeholder="Buscar por nombre, correo, teléfono o documento..." />
-    <!-- Botón para eliminar múltiples usuarios -->
-    <UButton v-if="selected.length > 0" :disabled="selected.length === 0" @click="openDeleteModalForSelected"
-      color="red" variant="outline" class="mt-4" icon="i-heroicons-trash-20-solid" title="Eliminar seleccionados" />
-    <br>
-    <UTable :rows="users" :columns="columns" :loading="loading"
+    <div class="top-actions">
+      <!-- Buscar -->
+      <UInput
+        v-model="search"
+        placeholder="Buscar por nombre, correo, teléfono o documento..."
+      />
+
+      <!-- Eliminar múltiples -->
+      <UButton
+        v-if="selected.length > 0"
+        :disabled="selected.length === 0"
+        @click="openDeleteModalForSelected"
+        color="red"
+        variant="outline"
+        class="delete-multiple-btn"
+        icon="i-heroicons-trash-20-solid"
+        title="Eliminar seleccionados"
+      />
+    </div>
+
+    <!-- Tabla -->
+    <UTable
+      :rows="users"
+      :columns="columns"
+      :loading="loading"
       :loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Loading...' }"
       :progress="{ color: 'primary', animation: 'carousel' }"
-      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No items.' }" v-model="selected">
-      <!-- Columna de acciones personalizada -->
+      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No items.' }"
+      v-model="selected"
+    >
+      <!-- Acciones -->
       <template #actions-data="{ row }">
         <UDropdown :items="actions(row)">
-          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+          <UButton
+            color="gray"
+            variant="ghost"
+            icon="i-heroicons-ellipsis-horizontal-20-solid"
+          />
         </UDropdown>
       </template>
     </UTable>
 
-
     <!-- Paginación -->
-    <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
+    <div class="pagination-bar">
       <UPagination v-model="page" :page-count="limit" :total="total" />
     </div>
 
-    <!-- Modal de edición -->
+    <!-- Modales -->
     <EditModal ref="editModal" :user="editingUser" @submit="editUser" />
-
-    <!-- Modal de eliminación -->
     <DeleteModal ref="deleteModal" :user="userToDelete" :selectedUsers="selected" @confirm="handleDeleteConfirm" />
-
-    <!-- Modal de creación de docente -->
     <CreateTeacherModal ref="createTeacherModal" @created="fetchUsers" />
   </UCard>
 </template>
@@ -194,3 +220,5 @@ const openCreateModal = () => {
   createTeacherModal.value?.openModalCreate();
 }
 </script>
+
+<style src="./TableTeacher.css"></style>

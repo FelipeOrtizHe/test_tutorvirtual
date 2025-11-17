@@ -1,0 +1,14 @@
+/* Logo Component Styles */
+
+/* Estilos para el logo */
+.logo {
+  width: 150px;
+  height: auto;
+}
+
+/* Estilos para el placeholder (mientras el logo se carga) */
+.logo-placeholder {
+  width: 150px;
+  height: 70px;
+  background-color: transparent;
+}
