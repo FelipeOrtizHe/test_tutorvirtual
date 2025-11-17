@@ -424,4 +424,5 @@ onMounted(fetchRecordatorios);
 watch(currentDate, fetchRecordatorios);
 </script>
 
-<style src="./Calendar.css"></style>
+<style src="./Calendar.vue">
+</style>

@@ -220,7 +220,7 @@ onMounted(fetchEvents)
 </script>
 
 
-<style src="./StudentCalendar.css"></style>
+<style src="./StudentCalendar.vue"></style>
 
 <!-- Mantengo tu CSS scoped para la altura + scrollbar -->
 <style scoped>
