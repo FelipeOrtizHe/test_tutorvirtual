@@ -1,38 +1,49 @@
 <template>
-  <div class="bg-transparent p-4 sm:p-6">
+  <div class="asignaturas">
     <UContainer>
-      <div class="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
-        <h2 class="text-2xl font-bold text-blue-600">Asignaturas</h2>
+      <div class="asignaturas__header">
+        <h2 class="asignaturas__title">Asignaturas</h2>
         <UButton color="blue" @click="showCreateModal = true" icon="i-heroicons-plus">
           Crear Asignatura
         </UButton>
       </div>
 
-      <div v-if="asignaturas.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        <UCard v-for="asignatura in asignaturas" :key="asignatura.id"
-          class="bg-white/80 dark:bg-gray-800/80 hover:shadow-lg transition-shadow duration-300 cursor-pointer"
-          @click="navigateToAsignatura(asignatura.id)">
+      <div v-if="asignaturas.length > 0" class="asignaturas__grid">
+        <UCard 
+          v-for="asignatura in asignaturas" 
+          :key="asignatura.id"
+          class="asignaturas__card"
+          @click="navigateToAsignatura(asignatura.id)"
+        >
           <template #header>
-            <h3 class="text-lg sm:text-xl font-bold text-center text-blue-600 uppercase">{{ asignatura.nombre }}</h3>
+            <h3 class="asignaturas__card-title">{{ asignatura.nombre }}</h3>
           </template>
-          <div class="p-4">
-            <p class="text-sm text-gray-600 dark:text-gray-300"><strong>Carrera:</strong> {{ asignatura.carrera }}</p>
-            <p class="text-sm text-gray-600 dark:text-gray-300"><strong>Jornada:</strong> {{ asignatura.jornada }}</p>
-            <p class="text-sm text-gray-600 dark:text-gray-300"><strong>Inscritos:</strong> {{
-              asignatura.estudiantes?.length || 0
-            }}</p>
-            <p v-if="asignatura.enlaceRegistro" class="text-sm text-gray-600 dark:text-gray-300 mt-2">
+          <div class="asignaturas__card-content">
+            <p class="asignaturas__card-text">
+              <strong>Carrera:</strong> {{ asignatura.carrera }}
+            </p>
+            <p class="asignaturas__card-text">
+              <strong>Jornada:</strong> {{ asignatura.jornada }}
+            </p>
+            <p class="asignaturas__card-text">
+              <strong>Inscritos:</strong> {{ asignatura.estudiantes?.length || 0 }}
+            </p>
+            <p v-if="asignatura.enlaceRegistro" class="asignaturas__card-text asignaturas__card-text--mt">
               <strong>Enlace de registro:</strong>
-              <UBadge color="blue" class="ml-2 cursor-pointer" @click.stop="copyLink(asignatura.enlaceRegistro)">
+              <UBadge 
+                color="blue" 
+                class="asignaturas__badge" 
+                @click.stop="copyLink(asignatura.enlaceRegistro)"
+              >
                 Copiar enlace
               </UBadge>
             </p>
-            <p class="text-sm text-gray-600 dark:text-gray-300">
+            <p class="asignaturas__card-text">
               <strong>Expira:</strong> {{ formatDate(asignatura.fechaExpiracion) }}
             </p>
           </div>
           <template #footer>
-            <div class="flex justify-between items-center">
+            <div class="asignaturas__card-footer">
               <UButton @click.stop="generateLink(asignatura.id)" color="blue" size="sm">
                 Generar Enlace
               </UButton>
@@ -43,7 +54,7 @@
           </template>
         </UCard>
       </div>
-      <div v-else class="text-center text-gray-600 dark:text-gray-400 py-8">
+      <div v-else class="asignaturas__empty">
         No hay asignaturas creadas.
       </div>
     </UContainer>
@@ -52,9 +63,9 @@
     <UModal v-model="showCreateModal">
       <UCard>
         <template #header>
-          <h3 class="text-lg font-bold">Crear Nueva Asignatura</h3>
+          <h3 class="asignaturas__modal-title">Crear Nueva Asignatura</h3>
         </template>
-        <UForm :state="formState" @submit="createSubject" class="space-y-4">
+        <UForm :state="formState" @submit="createSubject" class="asignaturas__form">
           <UFormGroup label="Nombre de la Asignatura" name="nombre" required>
             <UInput v-model="formState.nombre" placeholder="Introduce el nombre de la asignatura" />
           </UFormGroup>
@@ -68,7 +79,7 @@
           </UFormGroup>
         </UForm>
         <template #footer>
-          <div class="flex justify-end space-x-2">
+          <div class="asignaturas__modal-footer">
             <UButton color="gray" @click="showCreateModal = false">Cancelar</UButton>
             <UButton color="blue" :loading="loading" @click="createSubject">
               {{ loading ? 'Creando...' : 'Crear Asignatura' }}
@@ -112,7 +123,7 @@ const formState = reactive({
 
 const fetchAsignaturas = async () => {
   try {
-    const token = localStorage.getItem('token'); // Obtener el token almacenado
+    const token = localStorage.getItem('token');
     if (!token) throw new Error("No autenticado");
 
     const response = await $fetch<Asignatura[]>('/api/asignaturas', {
@@ -128,7 +139,6 @@ const fetchAsignaturas = async () => {
   }
 };
 
-
 const createSubject = async () => {
   if (!formState.nombre || !formState.carrera || !formState.jornada) {
     toast.add({ title: 'Por favor, completa todos los campos', color: 'yellow' });
@@ -138,7 +148,7 @@ const createSubject = async () => {
   loading.value = true;
 
   try {
-    const token = localStorage.getItem('token'); // Obtener token almacenado
+    const token = localStorage.getItem('token');
     if (!token) throw new Error('No autenticado');
 
     console.log("Datos a enviar:", {
@@ -150,14 +160,13 @@ const createSubject = async () => {
     const newAsignatura = await $fetch<Asignatura>('/api/asignaturas/create', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`, // Incluir el token en el header
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       body: {
         nombre: formState.nombre,
         carrera: formState.carrera,
         jornada: formState.jornada,
-        // No se envía idDocente porque se obtiene del token en el backend
       },
     });
 
@@ -230,3 +239,7 @@ onMounted(() => {
   fetchAsignaturas();
 });
 </script>
+
+<style scoped>
+@import '@/assets/components/asignaturas.css';
+</style>

@@ -1,0 +1,36 @@
+/* Contenedor principal del componente */
+.table-teacher-container {
+  padding: 1rem;
+}
+
+/* Contenedor del botón de crear */
+.create-btn-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+/* Barra superior: búsqueda + eliminar múltiples */
+.top-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Contenedor de la paginación */
+.pagination-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.875rem 0.75rem;
+  border-top: 1px solid var(--tbl-border-color, #e5e7eb);
+}
+
+/* Tema dark */
+.dark .pagination-bar {
+  border-color: #374151;
+}
+
+/* Botón de eliminar múltiples */
+.delete-multiple-btn {
+  margin-top: 0.75rem;
+}

@@ -1,0 +1,98 @@
+.modal-container {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+  box-shadow: var(--tw-shadow);
+}
+
+.dark .modal-container {
+  background: #27272a;
+}
+
+/* TITLES */
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1f2937;
+}
+
+.dark .section-title {
+  color: #e5e7eb;
+}
+
+/* FORM SPACING */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+/* SUBJECT LIST */
+.subjects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.subject-card {
+  padding: 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.dark .subject-card {
+  border-color: #374151;
+}
+
+/* HEADER */
+.subject-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subject-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.dark .subject-title {
+  color: #e5e7eb;
+}
+
+.subject-exp {
+  font-size: 0.875rem;
+  color: #4b5563;
+}
+
+.dark .subject-exp {
+  color: #9ca3af;
+}
+
+/* ACTIONS */
+.subject-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* LINK BOX */
+.subject-link-box {
+  margin-top: 1rem;
+}
+
+.subject-link-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.no-subjects {
+  color: #4b5563;
+}
+
+.dark .no-subjects {
+  color: #9ca3af;
+}
