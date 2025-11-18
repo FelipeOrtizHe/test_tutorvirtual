@@ -115,9 +115,15 @@ const loading = ref({
   averageMaterials: true,
 });
 
+type SubjectsRes = { count: number }
+type StudentsRes = { count: number }
+type AverageRes = { average: number }
+type ActiveInactiveRes = { active: number; inactive: number }
+type AverageMaterialsRes = { averageMaterials: number }
+
+
 const fetchStats = async () => {
   try {
-    // Realizamos todas las peticiones en paralelo
     const [
       subjectsRes,
       studentsRes,
@@ -125,11 +131,11 @@ const fetchStats = async () => {
       activeInactiveRes,
       averageMaterialsRes
     ] = await Promise.all([
-      $fetch('/api/stats/subjects/count'),
-      $fetch('/api/stats/students/count'),
-      $fetch('/api/stats/students/average'),
-      $fetch('/api/stats/asignaturas/active-inactive'),
-      $fetch('/api/stats/materials/average'),
+      $fetch<SubjectsRes>('/api/stats/subjects/count'),
+      $fetch<StudentsRes>('/api/stats/students/count'),
+      $fetch<AverageRes>('/api/stats/students/average'),
+      $fetch<ActiveInactiveRes>('/api/stats/asignaturas/active-inactive'),
+      $fetch<AverageMaterialsRes>('/api/stats/materials/average'),
     ]);
 
     stats.value = {
@@ -151,7 +157,6 @@ const fetchStats = async () => {
     };
   } catch (error) {
     console.error('Error cargando estadísticas:', error);
-    // Aquí podrías manejar los errores según tus necesidades
   }
 };
 
