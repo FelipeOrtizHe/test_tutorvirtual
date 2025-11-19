@@ -1,57 +1,32 @@
 <template>
-  <UCard class="table-subjects-container">
+  <UCard>
+    <UInput v-model="search" placeholder="Buscar por nombre, carrera o docente..." />
 
-    <!-- Input de búsqueda -->
-    <UInput
-      v-model="search"
-      placeholder="Buscar por nombre, carrera o docente..."
-    />
+    <!-- Botón para eliminar múltiples asignaturas -->
+    <UButton v-if="selected.length > 0" :disabled="selected.length === 0" @click="openDeleteModalForSelected"
+      color="red" variant="outline" class="mt-4" icon="i-heroicons-trash-20-solid" title="Eliminar seleccionados" />
+    <br>
 
-    <!-- Botón eliminar múltiples -->
-    <UButton
-      v-if="selected.length > 0"
-      :disabled="selected.length === 0"
-      @click="openDeleteModalForSelected"
-      color="red"
-      variant="outline"
-      class="delete-multiple-wrapper"
-      icon="i-heroicons-trash-20-solid"
-      title="Eliminar seleccionados"
-    />
-
-    <!-- Tabla -->
-    <UTable
-      :rows="asignaturas"
-      :columns="columns"
-      :loading="loading"
+    <UTable :rows="asignaturas" :columns="columns" :loading="loading"
       :loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Loading...' }"
       :progress="{ color: 'primary', animation: 'carousel' }"
-      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No items.' }"
-      v-model="selected"
-    >
+      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No items.' }" v-model="selected">
+      <!-- Columna de acciones personalizada -->
       <template #actions-data="{ row }">
         <UDropdown :items="actions(row)">
-          <UButton
-            color="gray"
-            variant="ghost"
-            icon="i-heroicons-ellipsis-horizontal-20-solid"
-          />
+          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
         </UDropdown>
       </template>
     </UTable>
 
     <!-- Paginación -->
-    <div class="pagination-bar">
+    <div class="flex justify-end px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
       <UPagination v-model="page" :page-count="limit" :total="total" />
     </div>
 
     <!-- Modal de eliminación -->
-    <DeleteAsignaturaModal
-      ref="deleteModal"
-      :asignatura="asignaturaToDelete"
-      :selectedAsignaturas="selected"
-      @confirm="handleDeleteConfirm"
-    />
+    <DeleteAsignaturaModal ref="deleteModal" :asignatura="asignaturaToDelete" :selectedAsignaturas="selected"
+      @confirm="handleDeleteConfirm" />
   </UCard>
 </template>
 
@@ -154,5 +129,3 @@ const openDeleteModalForSelected = () => {
   }
 }
 </script>
-
-<style src="./TableSubjects.css"></style>

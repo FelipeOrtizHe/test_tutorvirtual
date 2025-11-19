@@ -6,36 +6,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted } from 'vue';
 
-/** Tipos de las respuestas de la API */
-type SubjectsRes = { count: number }
-type StudentsRes = { count: number }
-type AverageStudentsRes = { average: number }
-type ActiveInactiveRes = { active: number; inactive: number }
-type AverageMaterialsRes = { averageMaterials: number }
-
-/** Serie de datos del gráfico */
 const series = ref([
   {
     name: 'Valores',
     data: [] as number[],
   },
-])
+]);
 
-/** Opciones del gráfico */
 const chartOptions = ref({
   chart: {
     id: 'stats-chart',
   },
   xaxis: {
+    // Definimos 6 categorías para nuestro gráfico
     categories: [
       'Asignaturas totales',
       'Estudiantes totales',
       'Promedio de estudiantes',
       'Asignaturas activas',
       'Asignaturas inactivas',
-      'Materiales por asignatura',
+      'Materiales por asignatura'
     ],
   },
   title: {
@@ -46,24 +38,24 @@ const chartOptions = ref({
       horizontal: false,
     },
   },
-})
+});
 
 const fetchChartStats = async () => {
   try {
-    // Peticiones en paralelo, tipadas
+    // Se ejecutan en paralelo todas las peticiones
     const [
       subjectsRes,
       studentsRes,
       averageStudentsRes,
       activeInactiveRes,
-      averageMaterialsRes,
+      averageMaterialsRes
     ] = await Promise.all([
-      $fetch<SubjectsRes>('/api/stats/subjects/count'),
-      $fetch<StudentsRes>('/api/stats/students/count'),
-      $fetch<AverageStudentsRes>('/api/stats/students/average'),
-      $fetch<ActiveInactiveRes>('/api/stats/asignaturas/active-inactive'),
-      $fetch<AverageMaterialsRes>('/api/stats/materials/average'),
-    ])
+      $fetch('/api/stats/subjects/count'),
+      $fetch('/api/stats/students/count'),
+      $fetch('/api/stats/students/average'),
+      $fetch('/api/stats/asignaturas/active-inactive'),
+      $fetch('/api/stats/materials/average'),
+    ]);
 
     series.value = [
       {
@@ -74,14 +66,14 @@ const fetchChartStats = async () => {
           Number(averageStudentsRes.average),            // Promedio de estudiantes
           activeInactiveRes.active,                      // Asignaturas activas
           activeInactiveRes.inactive,                    // Asignaturas inactivas
-          Number(averageMaterialsRes.averageMaterials),  // Promedio de materiales por asignatura
+          Number(averageMaterialsRes.averageMaterials)   // Promedio de materiales por asignatura
         ],
       },
-    ]
+    ];
   } catch (error) {
-    console.error('Error al cargar estadísticas para el gráfico:', error)
+    console.error('Error al cargar estadísticas para el gráfico:', error);
   }
-}
+};
 
-onMounted(fetchChartStats)
+onMounted(fetchChartStats);
 </script>

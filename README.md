@@ -6,11 +6,19 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 
 Make sure to install dependencies:
 
-IMPORTNTE NODE.JS VERSION: 22.19.1
 ```bash
 # npm
 npm install
 
+# pnpm
+pnpm install
+
+# yarn
+yarn install
+
+# bun
+bun install
+```
 
 ## Development Server
 
@@ -20,6 +28,15 @@ Start the development server on `http://localhost:3000`:
 # npm
 npm run dev
 
+# pnpm
+pnpm dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
+```
 ## Architecture system
 
 ```mermaid

@@ -1,48 +1,36 @@
 <template>
-  <div class="calendar-wrapper bg-white dark:bg-transparent">
-
-    <div class="calendar-main bg-white dark:bg-zinc-800 shadow-lg">
+  <div class="min-h-screen bg-white dark:bg-transparent">
+    <div class="max-w-7xl mx-auto bg-white dark:bg-zinc-800 rounded-xl shadow-lg overflow-hidden">
       <div class="flex flex-col lg:flex-row">
-
         <!-- Calendario -->
         <div class="w-full lg:w-2/3 p-4">
-
-          <!-- Título y navegación -->
           <div class="flex justify-between items-center mb-6">
-            <h2 class="calendar-title text-xl lg:text-2xl font-bold text-gray-800 dark:text-white">
+            <h2 class="text-xl lg:text-2xl font-bold text-gray-800 dark:text-white">
               {{ currentMonthName }} {{ currentYear }}
             </h2>
-
             <div class="flex space-x-2">
-              <button @click="previousMonth" class="calendar-nav-btn hover:bg-zinc-200 dark:hover:bg-zinc-900">
+              <button @click="previousMonth" class="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-900 transition-colors">
                 <i class="i-heroicons-chevron-left-20-solid w-5 h-5 text-gray-600 dark:text-gray-300"></i>
               </button>
-
-              <button @click="nextMonth" class="calendar-nav-btn hover:bg-zinc-200 dark:hover:bg-zinc-700">
+              <button @click="nextMonth" class="p-2 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
                 <i class="i-heroicons-chevron-right-20-solid w-5 h-5 text-gray-600 dark:text-gray-300"></i>
               </button>
             </div>
           </div>
 
-          <!-- Días de la semana -->
-          <div class="days-grid mb-2">
-            <div
-              v-for="day in daysOfWeek"
-              :key="day"
-              class="text-center font-semibold text-gray-600 dark:text-gray-400 text-xs lg:text-sm"
-            >
+          <div class="grid grid-cols-7 gap-1 mb-2">
+            <div v-for="day in daysOfWeek" :key="day" class="text-center font-semibold text-gray-600 dark:text-gray-400 text-xs lg:text-sm">
               {{ day }}
             </div>
           </div>
 
-          <!-- Días del calendario -->
-          <div class="days-grid">
+          <div class="grid grid-cols-7 gap-1">
             <button
               v-for="{ date, isCurrentMonth, isToday } in calendarDays"
               :key="date.toISOString()"
               @click="selectDate(date)"
               :class="[
-                'day-cell',
+                'p-1 w-full aspect-square rounded-lg text-center transition-colors text-xs lg:text-sm',
                 isCurrentMonth ? 'hover:bg-blue-100 dark:hover:bg-blue-900' : 'text-gray-400 dark:text-gray-600',
                 isToday ? 'bg-blue-200 dark:bg-blue-800 font-bold' : '',
                 isSelected(date) ? 'bg-blue-500 text-white' : '',
@@ -53,28 +41,28 @@
               <span>{{ date.getDate() }}</span>
             </button>
           </div>
-
         </div>
 
-        <!-- Lista de recordatorios -->
+        <!-- Recordatorios -->
         <div class="w-full lg:w-1/3 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-700 p-4">
           <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Recordatorios</h3>
-
           <div class="overflow-y-auto max-h-[calc(100vh-16rem)]">
             <ul v-if="recordatorios.length" class="space-y-2">
-
-              <li
-                v-for="reminder in recordatorios"
-                :key="reminder.id"
-                :class="['reminder-card', reminderImportanceClass(reminder.importancia)]"
+              <li 
+                v-for="reminder in recordatorios" 
+                :key="reminder.id" 
+                :class="[
+                  'p-3 rounded-lg mb-2 relative',
+                  reminderImportanceClass(reminder.importancia)
+                ]"
               >
-                <button
-                  @click="deleteReminder(reminder.id)"
+                <button 
+                  @click="deleteReminder(reminder.id)" 
                   class="absolute top-2 right-2 text-red-500 hover:text-red-700 dark:hover:text-red-400"
+                  aria-label="Eliminar recordatorio"
                 >
                   <i class="i-heroicons-trash-20-solid w-5 h-5"></i>
                 </button>
-
                 <div>
                   <h4 class="font-semibold text-gray-800 dark:text-white">{{ reminder.titulo }}</h4>
                   <p class="text-sm text-gray-600 dark:text-gray-400">{{ reminder.descripcion }}</p>
@@ -86,38 +74,30 @@
                   </p>
                 </div>
               </li>
-
             </ul>
-
-            <p v-else class="text-gray-600 dark:text-gray-400 text-center">No hay recordatorios.</p>
+            <p v-else class="text-gray-600 dark:text-gray-400">No hay recordatorios.</p>
           </div>
         </div>
-
       </div>
     </div>
 
-    <!-- Modal de nuevo recordatorio -->
+    <!-- Modal de Recordatorio -->
     <UModal v-model="showModal">
-      <div class="modal-body bg-white dark:bg-zinc-800">
+      <div class="bg-white dark:bg-zinc-800 rounded-lg p-6">
         <h3 class="text-lg font-semibold mb-4 text-gray-800 dark:text-white">Nuevo Recordatorio</h3>
-
         <form @submit.prevent="addReminder" class="space-y-4">
           <UFormGroup label="Título" name="title">
-            <UInput v-model="newReminder.title" required placeholder="Título del recordatorio" />
+            <UInput v-model="newReminder.title" placeholder="Título del recordatorio" required />
           </UFormGroup>
-
           <UFormGroup label="Descripción" name="description">
             <UTextarea v-model="newReminder.description" placeholder="Descripción del recordatorio" />
           </UFormGroup>
-
           <UFormGroup label="Asignatura" name="asignatura">
-            <USelect v-model="newReminder.asignaturaId" :options="asignaturasOptions" required />
+            <USelect v-model="newReminder.asignaturaId" :options="asignaturasOptions" placeholder="Selecciona una asignatura" required />
           </UFormGroup>
-
           <UFormGroup label="Importancia" name="importance">
-            <USelect v-model="newReminder.importance" :options="importanceOptions" required />
+            <USelect v-model="newReminder.importance" :options="importanceOptions" placeholder="Selecciona la importancia" required />
           </UFormGroup>
-
           <div class="flex justify-end space-x-2">
             <UButton color="gray" @click="showModal = false">Cancelar</UButton>
             <UButton color="primary" type="submit" :loading="isLoading">Guardar</UButton>
@@ -126,22 +106,16 @@
       </div>
     </UModal>
 
-    <!-- Notificaciones -->
-    <div
-      v-if="notification"
-      :class="[
-        'toast text-white',
-        {
-          'bg-green-500': notification.type === 'success',
-          'bg-red-500': notification.type === 'error',
-          'bg-blue-500': notification.type === 'info',
-          'bg-yellow-500': notification.type === 'warning',
-        },
-      ]"
-    >
+    <!-- Toast Notification -->
+    <div v-if="notification" :class="[
+      'fixed bottom-4 right-4 p-4 rounded-lg shadow-lg transition-opacity duration-300',
+      { 'bg-green-500': notification.type === 'success',
+        'bg-red-500': notification.type === 'error',
+        'bg-blue-500': notification.type === 'info',
+        'bg-yellow-500': notification.type === 'warning' }
+    ]">
       {{ notification.message }}
     </div>
-
   </div>
 </template>
 
@@ -424,5 +398,22 @@ onMounted(fetchRecordatorios);
 watch(currentDate, fetchRecordatorios);
 </script>
 
-<style src="./Calendar.vue">
+<style scoped>
+@media (max-width: 1023px) {
+  .calendar-container {
+    padding: 0.5rem;
+  }
+  
+  .grid-cols-7 {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+  
+  .p-4 {
+    padding: 0.75rem;
+  }
+}
 </style>
