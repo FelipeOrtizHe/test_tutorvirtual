@@ -53,6 +53,7 @@
     "nuxt": "^3.15.4",
     "pdf-parse": "^1.1.1",
     "pdf.js-extract": "^0.2.1",
+    "postgres": "^3.4.7",
     "uuid": "^11.0.5",
     "vue": "latest",
     "vue-router": "latest",
