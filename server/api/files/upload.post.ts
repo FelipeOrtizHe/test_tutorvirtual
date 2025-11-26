@@ -1,7 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
+import { fromNodeMiddleware } from "h3";
 import formidable from "formidable";
 import fs from "fs/promises";
+import type { NextFunction, Request, Response } from "express";
 
 const supabase = createClient(
   process.env.SUPABASE_URL!,
@@ -9,90 +11,89 @@ const supabase = createClient(
 );
 const prisma = new PrismaClient();
 
-export default defineEventHandler(async (event) => {
-  try {
-    const form = formidable({ multiples: false });
-    const { fields, files } = await new Promise<{
-      fields: formidable.Fields;
-      files: formidable.Files;
-    }>((resolve, reject) => {
-      form.parse(event.node.req, (err, fields, files) => {
-        if (err) reject(err);
-        resolve({ fields, files });
-      });
-    });
-
-    // Validar archivo
-    if (!files.file) {
-      throw createError({
-        statusCode: 400,
-        message: "No se recibió ningún archivo.",
-      });
-    }
-
-    // Obtener idAsignatura
-    const idAsignatura = parseInt(
-      Array.isArray(fields.idAsignatura)
-        ? fields.idAsignatura[0]
-        : fields.idAsignatura || "0" // Default to "0" if undefined
-    );
-    if (isNaN(idAsignatura)) {
-      throw createError({
-        statusCode: 400,
-        message: "El ID de la asignatura no es válido.",
-      });
-    }
-
-    // Verificar si la asignatura existe
-    const asignatura = await prisma.asignatura.findUnique({
-      where: { id: idAsignatura },
-    });
-    if (!asignatura) {
-      throw createError({
-        statusCode: 404,
-        message: "La asignatura no existe.",
-      });
-    }
-
-    // Subir archivo a Supabase
-    const file = Array.isArray(files.file) ? files.file[0] : files.file;
-    const fileData = await fs.readFile(file.filepath);
-    const { data: supabaseData, error: supabaseError } = await supabase.storage
-      .from("files")
-      .upload(file.originalFilename!, fileData, {
-        contentType: file.mimetype!,
-        upsert: true,
-      });
-
-    if (supabaseError) {
-      throw createError({
-        statusCode: 500,
-        message: "Error al subir el archivo a Supabase.",
-      });
-    }
-
-    // Obtener URL pública del archivo
-    const { data: publicUrlData } = supabase.storage
-      .from("files")
-      .getPublicUrl(supabaseData.path);
-    const publicUrl = publicUrlData.publicUrl;
-
-    // Guardar en la tabla Material
-    await prisma.material.create({
-      data: {
-        nombre: file.originalFilename || "Archivo",
-        tipo: file.mimetype || "application/octet-stream",
-        url: publicUrl,
-        idAsignatura: idAsignatura,
-      },
-    });
-
-    return { success: true };
-  } catch (err) {
-    console.error(err);
-    throw createError({
-      statusCode: 500,
-      message: "Error interno del servidor.",
-    });
+const uploadHandler = async (
+  req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
+  if (req.method !== "POST") {
+    res.status(405).json({ message: "Método no permitido." });
+    return;
   }
-});
+
+  const form = formidable({ multiples: false });
+
+  form.parse(req, (err, fields, files) => {
+    if (err) {
+      console.error("Error al procesar formulario:", err);
+      res.status(400).json({ message: "Error al procesar el formulario." });
+      return;
+    }
+
+    const processUpload = async () => {
+      const incomingFile = Array.isArray(files.file) ? files.file[0] : files.file;
+
+      if (!incomingFile) {
+        res.status(400).json({ message: "No se recibió ningún archivo." });
+        return;
+      }
+
+      const idAsignaturaValue = Array.isArray(fields.idAsignatura)
+        ? fields.idAsignatura[0]
+        : fields.idAsignatura;
+      const idAsignatura = parseInt((idAsignaturaValue as string) ?? "", 10);
+
+      if (!idAsignaturaValue || Number.isNaN(idAsignatura)) {
+        res.status(400).json({ message: "El ID de la asignatura no es válido." });
+        return;
+      }
+
+      const asignatura = await prisma.asignatura.findUnique({
+        where: { id: idAsignatura },
+      });
+
+      if (!asignatura) {
+        res.status(404).json({ message: "La asignatura no existe." });
+        return;
+      }
+
+      const fileData = await fs.readFile(incomingFile.filepath);
+      const uploadResult = await supabase.storage
+        .from("files")
+        .upload(incomingFile.originalFilename!, fileData, {
+          contentType: incomingFile.mimetype || "application/octet-stream",
+          upsert: true,
+        });
+
+      if (uploadResult.error || !uploadResult.data) {
+        console.error("Error al subir a Supabase:", uploadResult.error);
+        res
+          .status(500)
+          .json({ message: "Error al subir el archivo a Supabase." });
+        return;
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from("files")
+        .getPublicUrl(uploadResult.data.path);
+
+      await prisma.material.create({
+        data: {
+          nombre: incomingFile.originalFilename || "Archivo",
+          tipo: incomingFile.mimetype || "application/octet-stream",
+          url: publicUrlData.publicUrl,
+          idAsignatura,
+        },
+      });
+
+      res.json({ success: true });
+    };
+
+    processUpload().catch((processingError) => {
+      console.error("Error interno durante la carga:", processingError);
+      res.status(500).json({ message: "Error interno del servidor." });
+    });
+  });
+};
+
+export default fromNodeMiddleware(uploadHandler);
