@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { DecodedToken } from "../server/utils/jwt";
+import type { DecodedToken } from "../server/utils/jwt";
 
 const jwtSecret = process.env.JWT_SECRET || "fallback_secret";
 

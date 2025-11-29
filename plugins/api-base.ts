@@ -3,7 +3,6 @@ export default defineNuxtPlugin(() => {
   const apiFetch = $fetch.create({ baseURL: config.public.apiBase });
 
   // Redefinir $fetch global para apuntar al backend Express
-  // @ts-expect-error – sobrescribimos el helper global de Nuxt
   globalThis.$fetch = apiFetch;
 
   const originalFetch = globalThis.fetch;

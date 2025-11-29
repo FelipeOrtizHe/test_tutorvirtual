@@ -2,7 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import prisma from "../lib/prisma";
-import { DecodedToken } from "../server/utils/jwt";
+import type { DecodedToken } from "../server/utils/jwt";
 
 const router = Router();
 const jwtSecret = process.env.JWT_SECRET || "fallback_secret";
