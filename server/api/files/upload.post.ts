@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { fromNodeMiddleware } from "h3";
+import type { NodeMiddleware } from "h3";
 import formidable from "formidable";
 import fs from "fs/promises";
 import type { NextFunction, Request, Response } from "express";
@@ -96,4 +97,7 @@ const uploadHandler = async (
   });
 };
 
-export default fromNodeMiddleware(uploadHandler);
+const uploadMiddleware: NodeMiddleware = (req, res, next) =>
+  uploadHandler(req as any, res as any, next as any);
+
+export default fromNodeMiddleware(uploadMiddleware);
