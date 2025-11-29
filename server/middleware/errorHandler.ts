@@ -11,3 +11,5 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
 
   res.status(status).json({ message })
 }
+
+export default errorHandler
