@@ -1,24 +1,36 @@
 import type { NextFunction, Request, Response } from 'express'
+import { fromNodeMiddleware } from 'h3'
+import type { NodeMiddleware } from 'h3'
 import { verifyToken, type DecodedToken } from '../utils/jwt'
 
 export interface AuthenticatedRequest extends Request {
   user?: DecodedToken
 }
 
-export const requireAuth = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization
+const requireAuthMiddleware: NodeMiddleware = async (req, res, next) => {
+  const request = req as unknown as AuthenticatedRequest
+  const response = res as unknown as Response
+  const nextFn = next as NextFunction
+
+  const authHeader = request.headers.authorization
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Authorization token is missing' })
+    return response
+      .status(401)
+      .json({ message: 'Authorization token is missing' })
   }
 
   const token = authHeader.split(' ')[1]
 
   try {
     const decoded = await verifyToken(token)
-    req.user = decoded
-    next()
+    request.user = decoded
+    nextFn()
   } catch (error) {
-    res.status(401).json({ message: 'Invalid or expired token' })
+    response.status(401).json({ message: 'Invalid or expired token' })
   }
 }
+
+export const requireAuth = requireAuthMiddleware
+
+export default fromNodeMiddleware(requireAuthMiddleware)
