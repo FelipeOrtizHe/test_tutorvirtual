@@ -141,3 +141,7 @@ graph TB
 ```
 
 
+
+## Migración a Node.js + Express + React
+
+Se añadió una implementación de referencia basada en Express y React. Consulta [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) para ver la estructura de carpetas y los comandos necesarios para levantar ambos servicios.
