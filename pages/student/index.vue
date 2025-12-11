@@ -317,9 +317,10 @@ function formatDate(dateString: string): string {
   }).format(date);
 }
 
-function handleImageError(event: Event) {
-  const img = event.target as HTMLImageElement;
-  img.src = 'https://via.placeholder.com/800x400?text=IA+News';
+function handleImageError(event) {
+  const img = event.target;
+  img.onerror = null;
+  img.src = '/error-tec.jpg';
 }
 
 async function showArticleDetails(article: Article) {
